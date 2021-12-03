@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+        <title>Timeline</title>
+        
+        <!--style 태그는 CSS적용 부분이므로 자유롭게 수정하시면 됩니다.-->
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;700&display=swap');
+
+            body {
+                font-family: 'Noto Sans KR', sans-serif;
+                font-weight: 300;
+            }
+
+            .header {
+                margin-bottom: 50px;
+                text-align: center;
+            }
+
+            .btn-primary {
+                background-color: rgb(64, 156, 248);
+                border-color: rgb(64, 156, 248);
+            }
+
+            .card {
+                border: none;
+            }
+
+            .background-header {
+                position: fixed;
+                z-index: -1;
+                top: 0px;
+                width: 100%;
+                height: 428px;
+                background-color: rgb(158, 232, 255);
+            }
+
+            .background-body {
+                position: fixed;
+                z-index: -1;
+                top: 428px;
+                height: 100%;
+                width: 100%;
+                background-color: rgb(188, 239, 255);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="background-header">
+        </div>
+        <div class="background-body">
+        </div>
+        <div class="input-area">
+            <div class="header">
+                <br />
+                <h2>Timeline</h2>
+            </div>
+            <div class="container">
+                <div class="col" style="margin:10px">
+                    <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">닉네임을 입력하세요!</label>
+                        <input type="email" class="form-control" id="nickName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlTextarea1" class="form-label">내용을 입력하세요!</label>
+                        <textarea class="form-control" id="content" rows="3"></textarea>
+                    </div>
+                    <button type="button" id="btn_submit" class="btn btn-primary">등록</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" id="cards">
+
+
+            <!--참고: svg 태그에 해당하는 부분은 휴지통 아이콘 부분입니다. button 안에 이미지를 넣었다고 이해하시면 되고 svg 태그 부분은 따로 수정하지 않으셔도 됩니다.-->
+            <!--card 하나 요소-->
+
+            <div id="card" class="card border-dark mb-3">
+                <div class="card-header">
+                    No.메모번호
+                </div>
+                <div class="card-body text-dark">
+                    <h5 class="card-title">내용</h5>
+                    <p class="card-text">닉네임</p>
+                    <button id="btn_delete" style="border:0; background-color:transparent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                            <path fill-rule="evenodd"
+                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script>
+            
+            $(document).ready(getMessage);
+
+            document.getElementById("btn_submit").addEventListener('click', function() {
+                addMessage();
+
+                setTimeout(function() {
+                    getMessage();
+                }, 1000);
+            })
+
+
+            function getMessage(){
+                
+                $('#cards').empty();
+
+                $.ajax({
+                    type: 'GET',
+                    url: "http://127.0.0.1:3000/memos",
+                    data: 'json',
+                    success: function(data) {
+                        let result = data;
+
+                        for (let i=0; i<result.length; i++) {
+                            let memo = result[i];
+                            let memoId = memo.memoId;
+                            let nickName = memo.nickName;
+                            let content = memo.content;
+                            addHTML(memoId, nickName, content);
+                        }
+                    }
+                });
+            }
+        
+            function addHTML(memoId, nickName, content){
+                let html_text = `
+                    <div id="card" class="card border-dark mb-3">
+                        <div class="card-header">
+                            No.${memoId}
+                        </div>
+                        <div class="card-body text-dark">
+                            <h5 class="card-title">${content}</h5>
+                            <p class="card-text">${nickName}</p>
+                            <button id="${memoId}_btn_delete" onClick="deleteMessage(${memoId})"style="border:0; background-color:transparent">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path
+                                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                    <path fill-rule="evenodd"
+                                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `
+
+                $('#cards').append(html_text);
+            }
+        
+            function addMessage(){
+                let nickName = document.getElementById('nickName').value;
+                let content = $('#content').val();
+
+                let data = {
+                    'nickName': nickName,
+                    'content': content
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "http://127.0.0.1:3000/memos",
+                    contentType: "application/json",    // JSON 형식으로 전달함을 알리기
+                    data: JSON.stringify(data),         // javascript 값, 객체를 JSON문자열로 변환해줌
+                    success: function(response) {       // 서버가 성공적으로 응답했을 때 response 전달받음
+                        console.log(response);
+                    }
+                });
+
+                document.getElementById("nickName").value = '';
+                $('#content').val('');
+            }
+            
+            function deleteMessage(memoId){
+                $.ajax({
+                    type: "DELETE",
+                    url: "http://127.0.0.1:3000/memos/" + memoId,
+                    success: function(data) {       // 서버가 성공적으로 응답했을 때 response 전달받음
+                        console.log(data);
+                        alert('삭제되었습니다!');
+                    }
+                });
+
+                setTimeout(function() {
+                    getMessage();
+                }, 1000);
+            }
+            
+        </script>
+
+    </body>
+
+</html>
